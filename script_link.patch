@@ -1,0 +1,41 @@
+--- origsrc/sbt-launcher-package/src/windows/sbt	2018-09-16 21:50:29.000000000 -0400
++++ src/sbt-launcher-package/src/windows/sbt	2018-09-17 13:22:02.290598600 -0400
+@@ -13,7 +13,8 @@ else
+ JAVA_CMD=$JAVA_HOME/bin/java
+ fi
+ 
+-UDIR=`dirname "$0"`
++SCRIPT=$(readlink -e "$0")
++UDIR=$(dirname $SCRIPT)
+ if [ -z "$MSYSTEM" ]; then
+   WDIR=`cygpath -alm "$UDIR"`
+ else
+@@ -25,14 +26,17 @@ if [ -z "$JAVA_OPTS" ]; then
+ fi
+ 
+ # TODO - this check should detect cygwin terminal, not just xterm.
+-if [ "_$TERM" = "_xterm" ]; then
+-  # Let the terminal handle ANSI sequences
+-  stty -icanon min 1 -echo > /dev/null 2>&1
+-  "$JAVA_CMD" $JAVA_OPTS -Djline.terminal=jline.UnixTerminal -Dsbt.cygwin=true $SBT_OPTS -jar "$WDIR/sbt-launch.jar" "$@"
+-  SCALA_STATUS=$?
+-  stty icanon echo > /dev/null 2>&1
+-  exit $SCALA_STATUS
+-else
+-  # Use Jansi to intercept ANSI sequences
+-  "$JAVA_CMD" -Dsbt.log.format=true $JAVA_OPTS $SBT_OPTS -cp "$WDIR/sbt-launch.jar" xsbt.boot.Boot "$@"
+-fi
++case "$_TERM" in
++    _xterm*)
++	# Let the terminal handle ANSI sequences
++	stty -icanon min 1 -echo > /dev/null 2>&1
++	"$JAVA_CMD" $JAVA_OPTS -Djline.terminal=jline.UnixTerminal -Dsbt.cygwin=true $SBT_OPTS -jar "$WDIR/sbt-launch.jar" "$@"
++	SCALA_STATUS=$?
++	stty icanon echo > /dev/null 2>&1
++	exit $SCALA_STATUS
++	;;
++    *)
++	# Use Jansi to intercept ANSI sequences
++	"$JAVA_CMD" -Dsbt.log.format=true $JAVA_OPTS $SBT_OPTS -cp "$WDIR/sbt-launch.jar" xsbt.boot.Boot "$@"
++	;;
++esac

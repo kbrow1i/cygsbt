@@ -1,0 +1,47 @@
+NAME="sbt"
+VERSION=1.2.3
+RELEASE=1
+HOMEPAGE="https://github.com/sbt/sbt-launcher-package"
+
+GIT_URI="https://github.com/sbt/sbt-launcher-package.git"
+GIT_TAG=v${VERSION}
+inherit git
+
+# The github repo doesn't seem to contain the jar files.  We'll get
+# them from the Debian package.
+SRC_URI+=" https://dl.bintray.com/sbt/debian/sbt-1.2.3.deb"
+
+sbt_MESSAGE="In order to use sbt you will need to install a java development kit
+for Windows, such as Oracle JDK 8 or OpenJDK 8."
+
+CATEGORY="Devel"
+
+SUMMARY="An interactive build tool for Scala, Java, and more"
+
+DESCRIPTION="sbt is an interactive build tool for Scala, Java, and more."
+
+DIFF_EXCLUDES="*.tar *.jar"
+
+PATCH_URI="script_link.patch"
+
+src_compile() {
+    cd ${S}
+    ar -x sbt-1.2.3.deb data.tar
+    mkdir -p debian
+    cd debian
+    tar --wildcards -xf ../data.tar ./usr/share/sbt/bin/*.jar
+}
+
+src_install() {
+    cd ${S}
+    insinto /usr/share/sbt/conf
+    doins src/universal/conf/*
+    dodoc src/linux/usr/share/doc/sbt/* src/debian/changelog
+    doman  src/linux/usr/share/man/man1/*
+    exeinto /usr/share/sbt/bin
+    doexe src/windows/sbt
+    insinto /usr/share/sbt/bin
+    doins debian/usr/share/sbt/bin/*
+    dodir /usr/bin
+    dosym /usr/share/sbt/bin/sbt /usr/bin
+}
