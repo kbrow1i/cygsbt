@@ -11,8 +11,6 @@ inherit git
 # them from the Debian package.
 SRC_URI+=" https://dl.bintray.com/sbt/debian/sbt-1.2.3.deb"
 
-PATCH_URI="fix_script.patch"
-
 CATEGORY="Devel"
 SUMMARY="An interactive build tool for Scala, Java, and more"
 DESCRIPTION="sbt is an interactive build tool for Scala, Java, and more."
@@ -36,7 +34,7 @@ src_install() {
     dodoc src/linux/usr/share/doc/sbt/* src/debian/changelog
     doman  src/linux/usr/share/man/man1/*
     exeinto /usr/share/sbt/bin
-    doexe src/windows/sbt
+    doexe src/universal/bin/sbt src/universal/bin/sbt-launch-lib.bash
     insinto /usr/share/sbt/bin
     doins debian/usr/share/sbt/bin/*
     dodir /usr/bin
