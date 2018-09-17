@@ -11,18 +11,15 @@ inherit git
 # them from the Debian package.
 SRC_URI+=" https://dl.bintray.com/sbt/debian/sbt-1.2.3.deb"
 
+PATCH_URI="fix_script.patch"
+
+CATEGORY="Devel"
+SUMMARY="An interactive build tool for Scala, Java, and more"
+DESCRIPTION="sbt is an interactive build tool for Scala, Java, and more."
 sbt_MESSAGE="In order to use sbt you will need to install a java development kit
 for Windows, such as Oracle JDK 8 or OpenJDK 8."
 
-CATEGORY="Devel"
-
-SUMMARY="An interactive build tool for Scala, Java, and more"
-
-DESCRIPTION="sbt is an interactive build tool for Scala, Java, and more."
-
 DIFF_EXCLUDES="*.tar *.jar"
-
-PATCH_URI="script_link.patch"
 
 src_compile() {
     cd ${S}
@@ -45,3 +42,5 @@ src_install() {
     dodir /usr/bin
     dosym /usr/share/sbt/bin/sbt /usr/bin
 }
+
+ARCH=noarch
